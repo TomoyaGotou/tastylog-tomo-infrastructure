@@ -1,6 +1,7 @@
 #--------------
 #VPC Configuration
 #--------------
+#DNSサポートとDNSホスト名を有効、VPC内のリソースがDNSを使用して通信できるようにするため。
 resource "aws_vpc" "vpc" {
   cidr_block                       = var.vpc_cidr_block
   instance_tenancy                 = "default"
@@ -18,6 +19,7 @@ resource "aws_vpc" "vpc" {
 #--------------
 #Subnet
 #--------------
+#パブリックサブネットはインターネットアクセスが必要なリソースに使用、プライベートサブネットはインターネットアクセスが不要なリソースに使用。
 resource "aws_subnet" "public_subnet_1a" {
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = var.public_subnet_1a_cidr_block
@@ -77,6 +79,7 @@ resource "aws_subnet" "private_subnet_1c" {
 #--------------
 #route table
 #--------------
+#パブリックサブネットはインターネットゲートウェイへのルートを持ち、プライベートサブネットはNATゲートウェイへのルートを持つように設定。
 resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.vpc.id
 
@@ -120,6 +123,7 @@ resource "aws_route_table_association" "private_rt_1c" {
 #--------------
 #internet gateway
 #--------------
+#パブリックサブネットのルートテーブルにデフォルトルートを追加。
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
 
@@ -130,6 +134,7 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
+#innet gatewayへのルートを追加
 resource "aws_route" "public_rt_igw_r" {
   route_table_id         = aws_route_table.public_rt.id
   destination_cidr_block = "0.0.0.0/0"
@@ -139,42 +144,43 @@ resource "aws_route" "public_rt_igw_r" {
 #--------------
 #Nat gateway
 #--------------
-# resource "aws_eip" "nat_gw_1a" {
+#プライベートサブネットのルートテーブルにNATゲートウェイへのデフォルトルートを追加。AZごとにNATゲートウェイを配置して冗長性を確保。
+resource "aws_eip" "nat_gw_1a" {
 
-#   tags = {
-#     Name        = "${var.project}-${var.environment}-nat-gw-eip"
-#     project     = var.project
-#     environment = var.environment
-#   }
-# }
+  tags = {
+    Name        = "${var.project}-${var.environment}-nat-gw-eip"
+    project     = var.project
+    environment = var.environment
+  }
+}
 
-# resource "aws_eip" "nat_gw_1c" {
+resource "aws_eip" "nat_gw_1c" {
 
-#   tags = {
-#     Name        = "${var.project}-${var.environment}-nat-gw-eip"
-#     project     = var.project
-#     environment = var.environment
-#   }
-# }
+  tags = {
+    Name        = "${var.project}-${var.environment}-nat-gw-eip"
+    project     = var.project
+    environment = var.environment
+  }
+}
 
-# resource "aws_nat_gateway" "nat_gw_1a" {
-#   allocation_id = aws_eip.nat_gw_1a.id
-#   subnet_id     = aws_subnet.public_subnet_1a.id
+resource "aws_nat_gateway" "nat_gw_1a" {
+  allocation_id = aws_eip.nat_gw_1a.id
+  subnet_id     = aws_subnet.public_subnet_1a.id
 
-#   tags = {
-#     Name        = "${var.project}-${var.environment}-nat-gw-1a"
-#     project     = var.project
-#     environment = var.environment
-#   }
-# }
+  tags = {
+    Name        = "${var.project}-${var.environment}-nat-gw-1a"
+    project     = var.project
+    environment = var.environment
+  }
+}
 
-# resource "aws_nat_gateway" "nat_gw_1c" {
-#   allocation_id = aws_eip.nat_gw_1c.id
-#   subnet_id     = aws_subnet.public_subnet_1c.id
+resource "aws_nat_gateway" "nat_gw_1c" {
+  allocation_id = aws_eip.nat_gw_1c.id
+  subnet_id     = aws_subnet.public_subnet_1c.id
 
-#   tags = {
-#     Name        = "${var.project}-${var.environment}-nat-gw-1c"
-#     project     = var.project
-#     environment = var.environment
-#   }
-# }
+  tags = {
+    Name        = "${var.project}-${var.environment}-nat-gw-1c"
+    project     = var.project
+    environment = var.environment
+  }
+}

@@ -2,6 +2,7 @@
 #security group
 #--------------
 #ALB security group
+#albはインターネットからのHTTPSトラフィックを受け入れ、ECSセキュリティグループへのアウトバウンドルール
 resource "aws_security_group" "alb_sg" {
   name        = "${var.project}-${var.environment}-alb-sg"
   vpc_id      = var.vpc_id
@@ -14,6 +15,7 @@ resource "aws_security_group" "alb_sg" {
   }
 }
 
+#ALBSGのインバウンドルールは、CFのプレフィックスリストを使用してHTTPSトラフィックを許可。
 resource "aws_security_group_rule" "alb_sg_in_https" {
   security_group_id = aws_security_group.alb_sg.id
   type              = "ingress"
@@ -23,16 +25,18 @@ resource "aws_security_group_rule" "alb_sg_in_https" {
   prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cloudfront.id]
 }
 
-resource "aws_security_group_rule" "alb_sg_out_tcp3000" {
+#ALBSGのアウトバウンドルールは、ECSセキュリティグループへのHTTPトラフィックを許可。
+resource "aws_security_group_rule" "alb_sg_out_tcp80" {
   security_group_id = aws_security_group.alb_sg.id
   type              = "egress"
   protocol          = "tcp"
-  from_port         = 3000
-  to_port           = 3000
+  from_port         = 80
+  to_port           = 80
   source_security_group_id = aws_security_group.ecs_sg.id
 }
 
 #ecs security group
+#ECSSGは、ALBSGからのHTTPトラフィックを許可するインバウンドルールと、インターネットへのHTTPSトラフィックを許可するアウトバウンドルールを持つ。
 resource "aws_security_group" "ecs_sg" {
   name        = "${var.project}-${var.environment}-ecs-sg"
   vpc_id      = var.vpc_id
@@ -45,15 +49,17 @@ resource "aws_security_group" "ecs_sg" {
   }
 }
 
-resource "aws_security_group_rule" "ecs_sg_in_tcp3000" {
+#ECSSGのインバウンドルールは、ALBSGからのHTTPトラフィックを許可。
+resource "aws_security_group_rule" "ecs_sg_in_tcp80" {
   security_group_id        = aws_security_group.ecs_sg.id
   type                     = "ingress"
   protocol                 = "tcp"
-  from_port                = 3000
-  to_port                  = 3000
+  from_port                = 80
+  to_port                  = 80
   source_security_group_id = aws_security_group.alb_sg.id
 }
 
+#ECSSGのアウトバウンドルールは、インターネットへのHTTPSトラフィックを許可。
 resource "aws_security_group_rule" "ecs_sg_out_https" {
   security_group_id = aws_security_group.ecs_sg.id
   type              = "egress"
@@ -64,6 +70,7 @@ resource "aws_security_group_rule" "ecs_sg_out_https" {
 }
 
 #db security group
+#DBSGは、ECSSGからのMySQLトラフィックを許可するインバウンドルール
 resource "aws_security_group" "db_sg" {
   name        = "${var.project}-${var.environment}-db-sg"
   vpc_id      = var.vpc_id
@@ -76,7 +83,7 @@ resource "aws_security_group" "db_sg" {
   }
 }
 
-
+#mysqlのポート3306をECSSGから許可するインバウンドルール。
 resource "aws_security_group_rule" "db_sg_in_mysql" {
   security_group_id        = aws_security_group.db_sg.id
   type                     = "ingress"
@@ -86,7 +93,8 @@ resource "aws_security_group_rule" "db_sg_in_mysql" {
   source_security_group_id = aws_security_group.ecs_sg.id
 }
 
-#CLB prefix list
+#CloudFront prefix list
+#CloudFrontのプレフィックスリストを使用して、ALBSGのインバウンドルールでHTTPSトラフィックを許可。
 data "aws_ec2_managed_prefix_list" "cloudfront" {
   name = "com.amazonaws.global.cloudfront.origin-facing"
 }

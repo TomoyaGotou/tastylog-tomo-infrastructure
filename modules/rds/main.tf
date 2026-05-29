@@ -1,31 +1,34 @@
 # --------------
 # RDS parameter group
 # --------------
+#RDSのパラメーターグループを作成するモジュール。MySQL8.0用のパラメーターグループを作成。RDSインスタンスで使用
 resource "aws_db_parameter_group" "db_parameter_group" {
   name   = "${var.project}-${var.environment}-db-parameter-group"
   family = "mysql8.0"
 
+ # 文字コード（utf8mb4絵文字も使える）
   parameter {
     name  = "character_set_database"
     value = "utf8mb4"
   }
-
+ # サーバーの文字コード(デフォルト)
   parameter {
     name  = "character_set_server"
     value = "utf8mb4"
   }
 
+ # クライアントの文字コード（接続してくるアプリ側から）
   parameter {
     name  = "character_set_client"
     value = "utf8mb4"
   }
-  # 照合順序
+  # 照合順序（collation 大文字小文字の区別や略称を照合し扱う）
   parameter {
     name  = "collation_server"
     value = "utf8mb4_general_ci"
   }
 
-  # タイムゾーン
+  # タイムゾーン（そのまま）
   parameter {
     name  = "time_zone"
     value = "Asia/Tokyo"
@@ -41,6 +44,7 @@ resource "aws_db_parameter_group" "db_parameter_group" {
 # --------------
 # RDS option group
 # --------------
+#RDSのオプショングループを作成するモジュール。MySQL8.0用のオプショングループを作成。RDSインスタンスで使用
 resource "aws_db_option_group" "db_option_group" {
   name                 = "${var.project}-${var.environment}-db-option-group"
   engine_name          = "mysql"

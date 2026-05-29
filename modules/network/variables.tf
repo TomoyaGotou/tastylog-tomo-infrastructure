@@ -4,7 +4,6 @@ variable "project" {
 
 variable "environment" {
   type    = string
-  default = "dev"
 }
 
 variable "vpc_cidr_block" {
