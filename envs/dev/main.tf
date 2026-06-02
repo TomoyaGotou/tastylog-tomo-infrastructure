@@ -16,6 +16,13 @@ provider "aws" {
   region  = "ap-northeast-1"
 }
 
+#cloudfrontのACM証明書はバージニアリージョンで発行する必要があるため、プロバイダを追加
+provider "aws" {
+  alias   = "virginia"
+  profile = "terraform-tomo"
+  region  = "us-east-1"
+}
+
 #------------------------
 # Network
 #------------------------
@@ -34,6 +41,8 @@ module "vpc" {
   private_subnet_1c_cidr_block        = "10.0.4.0/24"
   private_subnet_1a_availability_zone = "ap-northeast-1a"
   private_subnet_1c_availability_zone = "ap-northeast-1c"
+  region                              = "ap-northeast-1"
+  #vpc_endpoint_sg_id                 = ${module.security_group.vpce_sg_id}
 }
 
 #------------------------
@@ -57,6 +66,9 @@ module "route53" {
   environment   = local.environment
   zone_domain   = local.zone_domain
   record_domain = local.record_domain
+
+  # cloudfront_domain_name    = module.cloudfront.domain_name
+  # cloudfront_hosted_zone_id = module.cloudfront.hosted_zone_id
 }
 
 #------------------------
@@ -65,6 +77,11 @@ module "route53" {
 # ACMはALBのSSL証明書に使用。Route53でドメインを管理しているため、DNS検証を使用して証明書を発行。
 module "acm" {
   source = "../../modules/ACM"
+
+  providers = {
+    aws          = aws
+    aws.virginia = aws.virginia
+  }
 
   project       = local.project
   environment   = local.environment
@@ -124,7 +141,7 @@ module "ecr" {
   source = "../../modules/ecr"
 
   project     = local.project
-  environment = local.environment  
+  environment = local.environment
 }
 
 #------------------------
@@ -156,4 +173,56 @@ module "iam" {
 
   project     = local.project
   environment = local.environment
+}
+
+#------------------------
+# CloudFront
+#------------------------
+#
+module "cloudfront" {
+  source = "../../modules/cloudfront"
+
+  project     = local.project
+  environment = local.environment
+
+  record_domain = local.record_domain
+  zone_domain   = local.zone_domain
+  origin_id     = "${local.project}-${local.environment}-alb-origin"
+
+  alb_dns_name        = module.alb.dns_name
+  acm_certificate_arn = module.acm.cloudfront_certificate_arn
+  waf_acl_arn         = module.waf.web_acl_arn
+}
+
+#------------------------
+# route53 record
+#------------------------
+# CloudFrontのドメインをRoute53のAレコードとして登録するモジュール。
+module "route53_record" {
+  source = "../../modules/route53_record"
+
+  project     = local.project
+  environment = local.environment
+
+  record_domain             = local.record_domain
+  zone_domain               = local.zone_domain
+  cloudfront_domain_name    = module.cloudfront.domain_name
+  cloudfront_hosted_zone_id = module.cloudfront.hosted_zone_id
+}
+
+#------------------------
+# waf
+#------------------------
+# WAFはAWSのWeb Application Firewallサービス。CloudFrontディストリビューションに
+module "waf" {
+  source = "../../modules/waf"
+
+  providers = {
+    aws.virginia = aws.virginia
+  }
+
+  project         = local.project
+  environment     = local.environment
+  waf_name        = "${local.project}-${local.environment}-waf"
+  waf_description = "${local.project}-${local.environment}-waf-acl"
 }

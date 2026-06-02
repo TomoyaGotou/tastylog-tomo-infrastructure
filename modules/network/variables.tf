@@ -3,7 +3,7 @@ variable "project" {
 }
 
 variable "environment" {
-  type    = string
+  type = string
 }
 
 variable "vpc_cidr_block" {
@@ -46,3 +46,11 @@ variable "private_subnet_1a_availability_zone" {
 variable "private_subnet_1c_availability_zone" {
   type = string
 }
+
+variable "region" {
+  type = string
+}
+
+# variable "vpc_endpoint_sg_id" {
+#   type = string
+# }

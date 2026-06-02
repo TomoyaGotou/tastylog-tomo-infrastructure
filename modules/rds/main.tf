@@ -6,18 +6,18 @@ resource "aws_db_parameter_group" "db_parameter_group" {
   name   = "${var.project}-${var.environment}-db-parameter-group"
   family = "mysql8.0"
 
- # 文字コード（utf8mb4絵文字も使える）
+  # 文字コード（utf8mb4絵文字も使える）
   parameter {
     name  = "character_set_database"
     value = "utf8mb4"
   }
- # サーバーの文字コード(デフォルト)
+  # サーバーの文字コード(デフォルト)
   parameter {
     name  = "character_set_server"
     value = "utf8mb4"
   }
 
- # クライアントの文字コード（接続してくるアプリ側から）
+  # クライアントの文字コード（接続してくるアプリ側から）
   parameter {
     name  = "character_set_client"
     value = "utf8mb4"
@@ -28,7 +28,7 @@ resource "aws_db_parameter_group" "db_parameter_group" {
     value = "utf8mb4_general_ci"
   }
 
-  # タイムゾーン（そのまま）
+  # タイムゾーン(日本時間に設定)
   parameter {
     name  = "time_zone"
     value = "Asia/Tokyo"
@@ -54,6 +54,7 @@ resource "aws_db_option_group" "db_option_group" {
 # --------------
 # RDS subnet group
 # --------------
+#RDSインスタンスを配置するサブネットを指定。プライベートサブネットを指定。
 resource "aws_db_subnet_group" "db_subnet_group" {
   name       = "${var.project}-${var.environment}-db-subnet-group"
   subnet_ids = var.subnet_ids
@@ -68,6 +69,7 @@ resource "aws_db_subnet_group" "db_subnet_group" {
 # --------------
 # RDS instance
 # --------------
+#Aurora MySQLを使用。マルチAZ構成。バックアップやメンテナンスウィンドウも設定。
 resource "random_string" "db_password" {
   length  = 16
   special = true

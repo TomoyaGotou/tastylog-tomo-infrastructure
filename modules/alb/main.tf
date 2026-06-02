@@ -1,6 +1,7 @@
 #------------------------
 # ALB
 #------------------------
+#cloudfrontからのリクエストを受付。ALBはHTTPS通信を提供し、ACMで発行したSSL証明書を使用。
 resource "aws_lb" "alb" {
   name               = "${var.project}-${var.environment}-alb"
   internal           = false
@@ -9,6 +10,11 @@ resource "aws_lb" "alb" {
   security_groups = [var.alb_sg_id]
 
   subnets = var.public_subnet_ids
+
+  tags = {
+    Project     = var.project
+    Environment = var.environment
+  }
 }
 
 #------------------------
@@ -46,11 +52,12 @@ resource "aws_lb_target_group" "alb_target_group" {
 # ALB listener
 #------------------------
 #albのリスナーを作成するモジュール。HTTPSリクエストを受け付け、ALBターゲットグループに転送する設定。
+#ACMで発行したSSL証明書のARNを指定
 resource "aws_lb_listener" "alb_listener" {
   load_balancer_arn = aws_lb.alb.arn
   port              = 443
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-tls13-12-res-pq-2025-09"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = var.acm_certificate_arn
 
   default_action {
@@ -65,6 +72,7 @@ resource "aws_lb_listener" "alb_listener" {
 }
 
 #risenerはHTTPとHTTPSの両方を設定。HTTPリクエストはHTTPSにリダイレクトするように設定。
+#HTTPリクエストをHTTPSにリダイレクトするため
 resource "aws_lb_listener" "alb_listener_http" {
   load_balancer_arn = aws_lb.alb.arn
   port              = 80

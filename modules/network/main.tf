@@ -184,3 +184,28 @@ resource "aws_nat_gateway" "nat_gw_1c" {
     environment = var.environment
   }
 }
+
+#--------------
+#VPC endpoint
+#--------------
+#
+# resource "aws_vpc_endpoint" "ecr_api" {
+#   vpc_id            = aws_vpc.vpc.id
+#   service_name      = "com.amazonaws.${var.region}.ecr.api"
+#   vpc_endpoint_type = "interface"
+
+#   subnet_ids = [
+#     aws_subnet.private_subnet_1a,
+#     aws_subnet.private_subnet_1c
+#   ]
+
+#   security_group_ids = [var.vpc_endpoint_sg_id]
+
+#   private_dns_enabled = true
+
+#   tags = {
+#     Name        = "${var.project}-${var.environment}-vpce-ecr-api"
+#     project     = var.project
+#     environment = var.environment
+#   }
+# }

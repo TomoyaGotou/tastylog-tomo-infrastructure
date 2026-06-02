@@ -1,4 +1,3 @@
-# ACM moduleの変数定義
 variable "project" {
   type = string
 }
@@ -7,10 +6,10 @@ variable "environment" {
   type = string
 }
 
-variable "zone_domain" {
+variable "waf_name" {
   type = string
 }
 
-variable "record_domain" {
+variable "waf_description" {
   type = string
 }

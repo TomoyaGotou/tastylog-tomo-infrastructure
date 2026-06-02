@@ -1,4 +1,3 @@
-# ACM moduleの変数定義
 variable "project" {
   type = string
 }
@@ -12,5 +11,13 @@ variable "zone_domain" {
 }
 
 variable "record_domain" {
+  type = string
+}
+
+variable "cloudfront_domain_name" {
+  type = string
+}
+
+variable "cloudfront_hosted_zone_id" {
   type = string
 }
