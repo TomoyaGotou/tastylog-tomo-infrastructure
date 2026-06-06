@@ -29,3 +29,19 @@ variable "alb_target_group_arn" {
 variable "execution_role_arn" {
   type = string
 }
+
+variable "db_host_arn" {
+  type = string
+}
+
+variable "db_database_arn" {
+  type = string
+}
+
+variable "db_username_arn" {
+  type = string
+}
+
+variable "db_password_arn" {
+  type = string
+}

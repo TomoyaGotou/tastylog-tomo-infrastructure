@@ -31,7 +31,7 @@ resource "aws_ecs_task_definition" "app_task" {
 
   container_definitions = jsonencode([
     {
-      name      = "app-container"
+      name      = "${var.project}-${var.environment}-app-container"
       image     = "${var.repository_url}:latest"
       essential = true
       portMappings = [
@@ -39,6 +39,26 @@ resource "aws_ecs_task_definition" "app_task" {
           containerPort = 80
           hostPort      = 80
           protocol      = "tcp"
+        }
+      ]
+
+      #SSMから取ってくる
+      secrets = [
+        {
+          name      = "DB_HOST"
+          valueFrom = var.db_host_arn
+        },
+        {
+          name      = "DB_DATABASE"
+          valueFrom = var.db_database_arn
+        },
+        {
+          name      = "DB_USERNAME"
+          valueFrom = var.db_username_arn
+        },
+        {
+          name      = "DB_PASSWORD"
+          valueFrom = var.db_password_arn
         }
       ]
     }
@@ -67,7 +87,7 @@ resource "aws_ecs_service" "app_service" {
 
   load_balancer {
     target_group_arn = var.alb_target_group_arn
-    container_name   = "app-container"
+    container_name   = "${var.project}-${var.environment}-app-container"
     container_port   = 80
   }
 }

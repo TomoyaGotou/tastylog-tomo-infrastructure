@@ -81,7 +81,7 @@ resource "aws_db_instance" "db_instance" {
 
   identifier = "${var.project}-${var.environment}-db-instance"
 
-  username = "admin"
+  username = var.db_username
   password = random_string.db_password.result
 
   instance_class = "db.t3.micro"

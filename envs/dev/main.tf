@@ -66,9 +66,6 @@ module "route53" {
   environment   = local.environment
   zone_domain   = local.zone_domain
   record_domain = local.record_domain
-
-  # cloudfront_domain_name    = module.cloudfront.domain_name
-  # cloudfront_hosted_zone_id = module.cloudfront.hosted_zone_id
 }
 
 #------------------------
@@ -106,7 +103,23 @@ module "rds" {
     module.vpc.private_subnet_1a_id,
     module.vpc.private_subnet_1c_id
   ]
-  db_name = "tastylogdb"
+  db_name     = "tastylogdb"
+  db_username = "admin"
+}
+
+#------------------------
+# SSM
+#------------------------
+module "ssm" {
+  source = "../../modules/ssm"
+
+  project     = local.project
+  environment = local.environment
+  db_host     = module.rds.db_host
+  db_database = module.rds.db_name
+  db_password = module.rds.db_password
+  db_username = module.rds.db_username
+  #app_key     = var.app_key
 }
 
 #------------------------
@@ -122,13 +135,20 @@ module "fargate" {
   ecs_sg_id            = module.security_group.ecs_sg_id
   alb_target_group_arn = module.alb.target_group_arn
   execution_role_arn   = module.iam.execution_role_arn
+  db_host_arn          = module.ssm.db_host_arn
+  db_database_arn      = module.ssm.db_database_arn
+  db_username_arn      = module.ssm.db_username_arn
+  db_password_arn      = module.ssm.db_password_arn
+  # app_key_arn  　　　 = module.ssm.app_key_arn
 
   private_subnet_ids = [
     module.vpc.private_subnet_1a_id,
     module.vpc.private_subnet_1c_id
   ]
 
-  depends_on     = [module.rds]
+  depends_on = [
+    module.rds
+  ]
   repository_url = module.ecr.repository_url
 
 }
@@ -225,4 +245,53 @@ module "waf" {
   environment     = local.environment
   waf_name        = "${local.project}-${local.environment}-waf"
   waf_description = "${local.project}-${local.environment}-waf-acl"
+}
+
+#------------------------
+# S3
+#------------------------
+
+module "s3" {
+  source = "../../modules/s3"
+
+  bucket_name = "${local.project}-${local.environment}-pipeline-artifact-bucket"
+}
+
+
+#------------------------
+# codebuild 
+#------------------------
+#
+module "codebuild" {
+  source = "../../modules/codebuild"
+
+  project            = local.project
+  environment        = local.environment
+  codebuild_role_arn = module.iam.codebuild_role_arn
+  repository_url     = module.ecr.repository_url
+  container_name     = "${local.project}-${local.environment}-app-container"
+  ecs_cluster_name   = module.fargate.ecs_cluster_name
+
+  private_subnet_id_1       = module.vpc.private_subnet_1a_id
+  private_subnet_id_2       = module.vpc.private_subnet_1c_id
+  ecs_sg_id                 = module.security_group.ecs_sg_id
+  migration_task_definition = "${local.project}-${local.environment}-app-task"
+}
+
+#------------------------
+# codepipeline
+#------------------------
+
+module "codepipeline" {
+  source = "../../modules/codepipeline"
+
+  project                  = local.project
+  environment              = local.environment
+  github_repository_name   = "tastylog-tomo-app"
+  github_branch_name       = "dev"
+  codepipeline_role_arn    = module.iam.codepipeline_role_arn
+  codebuild_project_name   = module.codebuild.codebuild_project_name
+  pipeline_artifact_bucket = module.s3.bucket_name
+  ecs_cluster_name         = module.fargate.ecs_cluster_name
+  ecs_service_name         = module.fargate.ecs_service_name
 }

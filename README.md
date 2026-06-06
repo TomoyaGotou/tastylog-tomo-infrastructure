@@ -1,5 +1,22 @@
-# tastylog-tomo-infrastructure
-.
+# tastylog-tomo-dev-infrastructure
+　後藤作成　terraform構築
+- prodとdev
+- 本番サイトと開発サイトの作成
+- インフラ構築まで
+
+## サイトURL
+- 本番（
+- 開発（
+　
+### 監視項目
+
+### 対応方
+
+### terraform管理場所
+
+### 
+
+’’’.
 ├── README.md
 ├── .gitignore
 ├── tastylog_tomo
@@ -75,3 +92,4 @@
     │   ├── outputs.tf
     │   ├── versions.tf
     │   └── variables.tf
+’’’

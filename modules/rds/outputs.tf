@@ -8,3 +8,16 @@ output "db_endpoint" {
 output "db_name" {
   value = var.db_name
 }
+
+output "db_host" {
+  value = aws_db_instance.db_instance.address
+}
+
+output "db_username" {
+  value = aws_db_instance.db_instance.username
+}
+
+output "db_password" {
+  value     = random_string.db_password.result
+  sensitive = true
+}
