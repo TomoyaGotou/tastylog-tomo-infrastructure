@@ -3,8 +3,9 @@
 #------------------------
 # dev環境で証明書を発行(東京リージョン)　
 resource "aws_acm_certificate" "tokyo_dev_acm_cert" {
-  domain_name       = var.record_domain
-  validation_method = "DNS"
+  domain_name               = var.record_domain
+  subject_alternative_names = ["alb.${var.record_domain}"]
+  validation_method         = "DNS"
 
   tags = {
     name        = "${var.project}-${var.environment}-dev-acm-cert"

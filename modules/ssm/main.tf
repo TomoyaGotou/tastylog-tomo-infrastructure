@@ -31,8 +31,8 @@ resource "aws_ssm_parameter" "db_port" {
   value = 3306
 }
 
-# resource "aws_ssm_parameter" "app_key" {
-#   name  = "/${var.project}/${var.environment}/app/APP_KEY"
-#   type  = "SecureString"
-#   value = var.app_key
-# }
+resource "aws_ssm_parameter" "app_key" {
+  name  = "/${var.project}/${var.environment}/app/APP_KEY"
+  type  = "SecureString"
+  value = var.app_key
+}

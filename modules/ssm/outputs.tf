@@ -14,3 +14,11 @@ output "db_username_arn" {
 output "db_password_arn" {
   value = aws_ssm_parameter.db_password.arn
 }
+
+output "db_port_arn" {
+  value = aws_ssm_parameter.db_port.arn
+}
+
+output "app_key_arn" {
+  value = aws_ssm_parameter.app_key.arn
+}

@@ -77,6 +77,6 @@ resource "aws_wafv2_ip_set" "allow_ip" {
   ip_address_version = "IPV4"
 
   addresses = [
-    "180.196.230.182/32", # 後藤 home IP address　動的IP注意
+    "180.196.159.64/32", # 後藤 home IP address　動的IP注意
   ]
 }

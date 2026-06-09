@@ -45,3 +45,20 @@ variable "db_username_arn" {
 variable "db_password_arn" {
   type = string
 }
+
+variable "task_role_arn" {
+  type = string
+}
+
+variable "db_port_arn" {
+  type = string
+}
+
+variable "app_key_arn" {
+  type = string
+}
+
+variable "aws_region" {
+  type = string
+}
+

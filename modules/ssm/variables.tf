@@ -25,7 +25,7 @@ variable "db_password" {
   sensitive = true
 }
 
-# variable "app_key" {
-#   type      = string
-#   sensitive = true
-# }
+variable "app_key" {
+  type      = string
+  sensitive = true
+}

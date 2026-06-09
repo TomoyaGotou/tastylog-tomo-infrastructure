@@ -28,6 +28,7 @@ resource "aws_ecs_task_definition" "app_task" {
   }
 
   execution_role_arn = var.execution_role_arn
+  task_role_arn      = var.task_role_arn
 
   container_definitions = jsonencode([
     {
@@ -41,6 +42,16 @@ resource "aws_ecs_task_definition" "app_task" {
           protocol      = "tcp"
         }
       ]
+
+      # #cloudwatchlogs への出力・エラー用
+      # logConfiguration = {
+      #   logDriver = "awslogs"
+      #   options = {
+      #     awslogs-group         = aws_cloudwatch_log_group.ecs.name
+      #     awslogs-region        = var.aws_region
+      #     awslogs-stream-prefix = "ecs"
+      #   }
+      # }
 
       #SSMから取ってくる
       secrets = [
@@ -59,6 +70,14 @@ resource "aws_ecs_task_definition" "app_task" {
         {
           name      = "DB_PASSWORD"
           valueFrom = var.db_password_arn
+        },
+        {
+          name      = "DB_PORT"
+          valueFrom = var.db_port_arn
+        },
+        {
+          name      = "APP_KEY"
+          valueFrom = var.app_key_arn
         }
       ]
     }
@@ -70,11 +89,12 @@ resource "aws_ecs_task_definition" "app_task" {
 #------------------------
 # Fargateサービスの定義。ALBと連携してトラフィックを分散。
 resource "aws_ecs_service" "app_service" {
-  name            = "${var.project}-${var.environment}-app-service"
-  cluster         = aws_ecs_cluster.ecs_cluster.id
-  task_definition = aws_ecs_task_definition.app_task.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
+  name                   = "${var.project}-${var.environment}-app-service"
+  cluster                = aws_ecs_cluster.ecs_cluster.id
+  task_definition        = aws_ecs_task_definition.app_task.arn
+  desired_count          = 1
+  launch_type            = "FARGATE"
+  enable_execute_command = true
 
   network_configuration {
     subnets = var.private_subnet_ids
@@ -89,5 +109,11 @@ resource "aws_ecs_service" "app_service" {
     target_group_arn = var.alb_target_group_arn
     container_name   = "${var.project}-${var.environment}-app-container"
     container_port   = 80
+  }
+
+  lifecycle {
+    ignore_changes = [
+      task_definition
+    ]
   }
 }

@@ -119,7 +119,7 @@ module "ssm" {
   db_database = module.rds.db_name
   db_password = module.rds.db_password
   db_username = module.rds.db_username
-  #app_key     = var.app_key
+  app_key     = var.app_key
 }
 
 #------------------------
@@ -131,15 +131,19 @@ module "fargate" {
 
   project              = local.project
   environment          = local.environment
+  repository_url       = module.ecr.repository_url
   vpc_id               = module.vpc.vpc_id
   ecs_sg_id            = module.security_group.ecs_sg_id
   alb_target_group_arn = module.alb.target_group_arn
   execution_role_arn   = module.iam.execution_role_arn
+  task_role_arn        = module.iam.task_role_arn
   db_host_arn          = module.ssm.db_host_arn
   db_database_arn      = module.ssm.db_database_arn
   db_username_arn      = module.ssm.db_username_arn
   db_password_arn      = module.ssm.db_password_arn
-  # app_key_arn  　　　 = module.ssm.app_key_arn
+  db_port_arn          = module.ssm.db_port_arn
+  app_key_arn          = module.ssm.app_key_arn
+  aws_region           = "ap-northeast-1"
 
   private_subnet_ids = [
     module.vpc.private_subnet_1a_id,
@@ -149,7 +153,6 @@ module "fargate" {
   depends_on = [
     module.rds
   ]
-  repository_url = module.ecr.repository_url
 
 }
 
@@ -228,6 +231,8 @@ module "route53_record" {
   zone_domain               = local.zone_domain
   cloudfront_domain_name    = module.cloudfront.domain_name
   cloudfront_hosted_zone_id = module.cloudfront.hosted_zone_id
+  alb_dns_name              = module.alb.dns_name
+  alb_zone_id               = module.alb.zone_id
 }
 
 #------------------------
@@ -250,7 +255,7 @@ module "waf" {
 #------------------------
 # S3
 #------------------------
-
+#artifact-bucket用　
 module "s3" {
   source = "../../modules/s3"
 

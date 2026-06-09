@@ -11,7 +11,7 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
   aliases = [var.record_domain]
 
   origin {
-    domain_name = var.alb_dns_name
+    domain_name = "alb.${var.record_domain}"
     origin_id   = "${var.project}-${var.environment}-alb-origin"
 
     custom_origin_config {

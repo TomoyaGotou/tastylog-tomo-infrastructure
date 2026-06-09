@@ -1,5 +1,5 @@
 output "execution_role_arn" {
-  value = aws_iam_role.fagate_task_execution.arn
+  value = aws_iam_role.fargate_task_execution.arn
 }
 
 output "codepipeline_role_arn" {
@@ -8,4 +8,8 @@ output "codepipeline_role_arn" {
 
 output "codebuild_role_arn" {
   value = aws_iam_role.codebuild_role.arn
+}
+
+output "task_role_arn" {
+  value = aws_iam_role.fargate_task_role.arn
 }
