@@ -29,3 +29,11 @@ variable "app_key" {
   type      = string
   sensitive = true
 }
+
+variable "record_domain" {
+  type = string
+}
+
+variable "app_url" {
+  type = string
+}

@@ -62,3 +62,10 @@ variable "aws_region" {
   type = string
 }
 
+variable "ecs_log_group_name" {
+  type = string
+}
+
+variable "app_url_arn" {
+  type = string
+}

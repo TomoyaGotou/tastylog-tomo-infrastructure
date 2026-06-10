@@ -5,7 +5,7 @@
 resource "aws_cloudfront_distribution" "cloudfront_distribution" {
   enabled         = true
   is_ipv6_enabled = true
-  price_class     = "PriceClass_100" # 最も安価なリージョンのみを使用
+  price_class     = "PriceClass_200"
   web_acl_id      = var.waf_acl_arn
 
   aliases = [var.record_domain]
@@ -30,6 +30,9 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
 
     forwarded_values {
       query_string = true
+
+      headers = ["Host"]
+
       cookies {
         forward = "all"
       }

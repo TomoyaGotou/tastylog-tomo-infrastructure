@@ -22,3 +22,7 @@ output "db_port_arn" {
 output "app_key_arn" {
   value = aws_ssm_parameter.app_key.arn
 }
+
+output "app_url_arn" {
+  value = aws_ssm_parameter.app_url.arn
+}

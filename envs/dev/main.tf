@@ -113,13 +113,17 @@ module "rds" {
 module "ssm" {
   source = "../../modules/ssm"
 
-  project     = local.project
-  environment = local.environment
+  project       = local.project
+  environment   = local.environment
+  record_domain = local.record_domain
+
   db_host     = module.rds.db_host
   db_database = module.rds.db_name
   db_password = module.rds.db_password
   db_username = module.rds.db_username
-  app_key     = var.app_key
+
+  app_key = var.app_key
+  app_url = "https://${local.record_domain}"
 }
 
 #------------------------
@@ -143,7 +147,10 @@ module "fargate" {
   db_password_arn      = module.ssm.db_password_arn
   db_port_arn          = module.ssm.db_port_arn
   app_key_arn          = module.ssm.app_key_arn
-  aws_region           = "ap-northeast-1"
+  app_url_arn          = module.ssm.app_url_arn
+
+  aws_region         = "ap-northeast-1"
+  ecs_log_group_name = local.ecs_log_group_name
 
   private_subnet_ids = [
     module.vpc.private_subnet_1a_id,
@@ -153,7 +160,6 @@ module "fargate" {
   depends_on = [
     module.rds
   ]
-
 }
 
 #------------------------
@@ -299,4 +305,24 @@ module "codepipeline" {
   pipeline_artifact_bucket = module.s3.bucket_name
   ecs_cluster_name         = module.fargate.ecs_cluster_name
   ecs_service_name         = module.fargate.ecs_service_name
+}
+
+
+#------------------------
+# cloudwatch
+#------------------------
+module "cloudwatch" {
+  source = "../../modules/cloudwatch"
+
+  project     = local.project
+  environment = local.environment
+
+  alarm_email = "n0m3298m0n@gmail.com"
+
+  ecs_cluster_name = module.fargate.cluster_name
+  ecs_service_name = local.ecs_service_name
+
+  alb_arn_suffix = module.alb.alb_arn_suffix
+
+  cloudfront_distribution_id = module.cloudfront.distribution_id
 }

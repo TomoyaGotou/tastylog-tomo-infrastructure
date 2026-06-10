@@ -43,15 +43,15 @@ resource "aws_ecs_task_definition" "app_task" {
         }
       ]
 
-      # #cloudwatchlogs への出力・エラー用
-      # logConfiguration = {
-      #   logDriver = "awslogs"
-      #   options = {
-      #     awslogs-group         = aws_cloudwatch_log_group.ecs.name
-      #     awslogs-region        = var.aws_region
-      #     awslogs-stream-prefix = "ecs"
-      #   }
-      # }
+      #cloudwatchlogs への出力・エラー用
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = var.ecs_log_group_name
+          awslogs-region        = var.aws_region
+          awslogs-stream-prefix = "ecs"
+        }
+      }
 
       #SSMから取ってくる
       secrets = [
@@ -78,6 +78,10 @@ resource "aws_ecs_task_definition" "app_task" {
         {
           name      = "APP_KEY"
           valueFrom = var.app_key_arn
+        },
+        {
+          name      = "APP_URL"
+          valueFrom = var.app_url_arn
         }
       ]
     }

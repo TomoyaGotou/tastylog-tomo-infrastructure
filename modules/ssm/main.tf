@@ -1,5 +1,5 @@
 #
-# Parameter
+# Parameter Store
 #
 resource "aws_ssm_parameter" "db_host" {
   name  = "/${var.project}/${var.environment}/app/DB_HOST"
@@ -35,4 +35,11 @@ resource "aws_ssm_parameter" "app_key" {
   name  = "/${var.project}/${var.environment}/app/APP_KEY"
   type  = "SecureString"
   value = var.app_key
+}
+
+resource "aws_ssm_parameter" "app_url" {
+  name      = "/${var.project}/${var.environment}/app/APP_URL"
+  type      = "String"
+  value     = var.app_url
+  overwrite = true
 }
