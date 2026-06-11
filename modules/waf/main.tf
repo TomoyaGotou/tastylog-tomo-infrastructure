@@ -20,7 +20,9 @@ resource "aws_wafv2_web_acl" "waf_acl" {
     sampled_requests_enabled   = true
   }
 
-
+  ######################## 
+  ###ーー本番ーーコメントイン
+  ########################
   rule {
     name     = "AllowJapan"
     priority = 1
@@ -76,7 +78,6 @@ resource "aws_wafv2_ip_set" "allow_ip" {
 
   ip_address_version = "IPV4"
 
-  addresses = [
-    "180.196.159.64/32", # 後藤 home IP address　動的IP注意
-  ]
+  addresses = var.allowed_ip_addresses # 後藤 home IP address　動的IP注意
+
 }

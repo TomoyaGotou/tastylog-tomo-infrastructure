@@ -122,7 +122,7 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 #-----------------
 #Interface Endpoint security group
 #-----------------
-#ECS exer
+#ECS exec用
 resource "aws_security_group" "vpce_sg" {
   name        = "${var.project}-${var.environment}-vpce-sg"
   vpc_id      = var.vpc_id

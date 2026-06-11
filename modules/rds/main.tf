@@ -96,7 +96,7 @@ resource "aws_db_instance" "db_instance" {
   publicly_accessible    = false
   port                   = 3306
 
-  name                 = var.db_name
+  db_name              = var.db_name
   parameter_group_name = aws_db_parameter_group.db_parameter_group.name
   option_group_name    = aws_db_option_group.db_option_group.name
 

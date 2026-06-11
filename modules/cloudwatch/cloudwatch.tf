@@ -21,16 +21,16 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_high" {
   ok_actions    = [aws_sns_topic.alarm.arn]
 }
 
-# ECS メモリ使用率アラーム　
+# ECS メモリ使用率アラーム　CPU50％　1分継続　即アラーム　SNS通知　
 resource "aws_cloudwatch_metric_alarm" "ecs_memory_high" {
   alarm_name          = "${var.project}-${var.environment}-ecs-memory-high"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 2
+  evaluation_periods  = 1
   metric_name         = "MemoryUtilization"
   namespace           = "AWS/ECS"
-  period              = 300
+  period              = 60
   statistic           = "Average"
-  threshold           = 80
+  threshold           = 15
 
   dimensions = {
     ClusterName = var.ecs_cluster_name

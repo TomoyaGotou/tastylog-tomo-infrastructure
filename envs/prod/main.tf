@@ -32,17 +32,16 @@ module "vpc" {
 
   project                             = local.project
   environment                         = local.environment
-  vpc_cidr_block                      = "10.0.0.0/16"
-  public_subnet_1a_cidr_block         = "10.0.1.0/24"
-  public_subnet_1c_cidr_block         = "10.0.2.0/24"
+  vpc_cidr_block                      = "10.1.0.0/16"
+  public_subnet_1a_cidr_block         = "10.1.1.0/24"
+  public_subnet_1c_cidr_block         = "10.1.2.0/24"
   public_subnet_1a_availability_zone  = "ap-northeast-1a"
   public_subnet_1c_availability_zone  = "ap-northeast-1c"
-  private_subnet_1a_cidr_block        = "10.0.3.0/24"
-  private_subnet_1c_cidr_block        = "10.0.4.0/24"
+  private_subnet_1a_cidr_block        = "10.1.3.0/24"
+  private_subnet_1c_cidr_block        = "10.1.4.0/24"
   private_subnet_1a_availability_zone = "ap-northeast-1a"
   private_subnet_1c_availability_zone = "ap-northeast-1c"
   region                              = "ap-northeast-1"
-  #vpc_endpoint_sg_id                 = ${module.security_group.vpce_sg_id}
 }
 
 #------------------------
@@ -59,14 +58,14 @@ module "security_group" {
 #------------------------
 # Route53
 #------------------------
-module "route53" {
-  source = "../../modules/Route53"
+# module "route53" {
+#   source = "../../modules/Route53"
 
-  project       = local.project
-  environment   = local.environment
-  zone_domain   = local.zone_domain
-  record_domain = local.record_domain
-}
+#   project       = local.project
+#   environment   = local.environment
+#   zone_domain   = local.zone_domain
+#   record_domain = local.record_domain
+# }
 
 #------------------------
 # ACM
@@ -82,15 +81,15 @@ module "acm" {
 
   project       = local.project
   environment   = local.environment
-  record_domain = "dev.gotomo-lab.click"
-  zone_domain   = "gotomo-lab.click"
-  depends_on    = [module.route53]
+  record_domain = local.record_domain
+  zone_domain   = local.zone_domain
+  # depends_on    = [module.route53]
 }
 
 #------------------------
 # rds
 #------------------------
-# RDSはAurora MySQLを使用。プライベートサブネットに配置し、セキュリティグループでアクセスを制限。
+# RDS MySQLを使用。プライベートサブネットに配置し、セキュリティグループでアクセスを制限。
 module "rds" {
   source = "../../modules/rds"
 
@@ -191,7 +190,7 @@ module "alb" {
     module.vpc.public_subnet_1a_id,
     module.vpc.public_subnet_1c_id
   ]
-  depends_on = [module.route53]
+  # depends_on = [module.route53]
 }
 
 #------------------------
@@ -257,7 +256,7 @@ module "waf" {
   waf_name        = "${local.project}-${local.environment}-waf"
   waf_description = "${local.project}-${local.environment}-waf-acl"
 
-  enable_allow_japan = false
+  enable_allow_japan = true
 
   allowed_ip_addresses = [
     "180.196.159.64/32"
@@ -305,7 +304,7 @@ module "codepipeline" {
   project                  = local.project
   environment              = local.environment
   github_repository_name   = "tastylog-tomo-app"
-  github_branch_name       = "dev"
+  github_branch_name       = "main"
   codepipeline_role_arn    = module.iam.codepipeline_role_arn
   codebuild_project_name   = module.codebuild.codebuild_project_name
   pipeline_artifact_bucket = module.s3.bucket_name
