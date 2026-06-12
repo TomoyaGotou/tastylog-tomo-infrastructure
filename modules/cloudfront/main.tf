@@ -31,7 +31,7 @@ resource "aws_cloudfront_distribution" "cloudfront_distribution" {
     forwarded_values {
       query_string = true
 
-      headers = ["Host"]
+      headers = ["Host"] # laravel側の設定でホストヘッダーを明示的に指定しない限りは送信元(この場合ALB)になる仕様となっていたため設定
 
       cookies {
         forward = "all"

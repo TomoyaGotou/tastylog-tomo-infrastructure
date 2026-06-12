@@ -221,8 +221,8 @@ resource "aws_route" "private_rt_1c_nat_r" {
 #   vpc_endpoint_type = "interface"
 
 #   subnet_ids = [
-#     aws_subnet.private_subnet_1a,
-#     aws_subnet.private_subnet_1c
+#     aws_subnet.private_subnet_1a_id,
+#     aws_subnet.private_subnet_1c_id
 #   ]
 
 #   security_group_ids = [var.vpc_endpoint_sg_id]
