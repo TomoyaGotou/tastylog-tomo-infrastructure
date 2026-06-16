@@ -105,7 +105,7 @@ resource "aws_db_instance" "db_instance" {
   maintenance_window         = "sun:05:00-sun:06:00"
   auto_minor_version_upgrade = true
 
-  deletion_protection = false
+  deletion_protection = true #開発環境false 
   skip_final_snapshot = true
 
   apply_immediately = true

@@ -63,7 +63,7 @@ S3 Backend
 ### 設計資料
 
 - [Terraform設計方針](https://docs.google.com/document/d/1M232RBtb_-XtN_cxNb9_KZwLFJNfdFE8U2dBrKMnLQE/edit?usp=sharing)
-- [パラメータシート](Ghttps://docs.google.com/spreadsheets/d/1YIZ4AjGhH6x8bDoH70tJwgyxuNQrpL4ajbEnY9nWE4g/edit?usp=sharing)
+- [パラメータシート](https://docs.google.com/spreadsheets/d/1YIZ4AjGhH6x8bDoH70tJwgyxuNQrpL4ajbEnY9nWE4g/edit?usp=sharing)
 
 ### セキュリティ
 
