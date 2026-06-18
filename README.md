@@ -1,6 +1,6 @@
 ## tastylog-tomo-infrastructure
 　後藤作成の terraform による　AWSインフラ構築リポジトリです。
-- LaravelアプリケーションをAWS上で動作させるためのインフラをdev/prodの2環境で管理している。
+- LaravelアプリケーションをAWS上で動作させるためのインフラをdev/prodの2環境で管理しています。
 
 - 本リポジトリは、Laravel製の食べログ風アプリケーションを題材として、
 - AWS上に本番・開発環境をTerraformで構築した学習プロジェクトです。
