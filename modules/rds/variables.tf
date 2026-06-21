@@ -25,3 +25,7 @@ variable "db_name" {
 variable "db_username" {
   type = string
 }
+
+variable "deletion_protection" {
+  type = string
+}

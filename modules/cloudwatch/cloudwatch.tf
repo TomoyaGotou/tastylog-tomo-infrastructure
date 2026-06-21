@@ -30,7 +30,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_memory_high" {
   namespace           = "AWS/ECS"
   period              = 60
   statistic           = "Average"
-  threshold           = 15
+  threshold           = 50
 
   dimensions = {
     ClusterName = var.ecs_cluster_name

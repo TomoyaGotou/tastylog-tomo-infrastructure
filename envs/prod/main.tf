@@ -104,6 +104,8 @@ module "rds" {
   ]
   db_name     = "tastylogdb"
   db_username = "admin"
+
+  deletion_protection = "false"
 }
 
 #------------------------
